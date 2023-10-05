@@ -87,7 +87,7 @@ func (r *WildlifePreserveReconciler) Reconcile(ctx context.Context, req ctrl.Req
 					Containers: []coreV1.Container{
 						{
 							Name:  "wildlife-preserve-app",
-							Image: "wildlifepreserve", // Replace with your Go app image
+							Image: "wildlife-preserve-app", // Replace with your Go app image
 							VolumeMounts: []coreV1.VolumeMount{
 								{
 									Name:      "animals-storage", // Replace with your volume name
