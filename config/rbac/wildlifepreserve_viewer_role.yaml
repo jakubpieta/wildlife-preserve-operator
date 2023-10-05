@@ -1,0 +1,27 @@
+# permissions for end users to view wildlifepreserves.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: wildlifepreserve-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: wildlife-preserve-operator
+    app.kubernetes.io/part-of: wildlife-preserve-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: wildlifepreserve-viewer-role
+rules:
+- apiGroups:
+  - wildlife.preserves.my.domain
+  resources:
+  - wildlifepreserves
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - wildlife.preserves.my.domain
+  resources:
+  - wildlifepreserves/status
+  verbs:
+  - get

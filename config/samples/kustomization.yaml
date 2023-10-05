@@ -1,0 +1,4 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- wildlife.preserves_v1alpha1_wildlifepreserve.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
