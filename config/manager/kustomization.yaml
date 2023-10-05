@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: docker.io/jakubpieta/wildlife-preserve-operator
-  newTag: v0.0.8
+  newTag: v0.0.9

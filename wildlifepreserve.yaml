@@ -6,5 +6,5 @@ metadata:
 spec:
   name: "Bialowieza"
   volumeMountPath: "/animals-storage"
-  replicas: 3
+  replicas: 1
   location: "Poland"
