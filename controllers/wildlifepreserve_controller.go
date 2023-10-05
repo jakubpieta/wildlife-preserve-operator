@@ -22,8 +22,10 @@ import (
 	appsV1 "k8s.io/api/apps/v1"
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -37,9 +39,12 @@ type WildlifePreserveReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=wildlife.preserves.my.domain,resources=wildlifepreserves,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=wildlife.preserves.my.domain,resources=wildlifepreserves/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=wildlife.preserves.my.domain,resources=wildlifepreserves/finalizers,verbs=update
+//+kubebuilder:rbac:groups=wildlife.preserves.jakubpieta,resources=wildlifepreserves,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;list;create;update;patch;delete
+//+kubebuilder:rbac:groups=wildlife.preserves.jakubpieta,resources=wildlifepreserves/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=wildlife.preserves.jakubpieta,resources=wildlifepreserves/finalizers,verbs=update
 
 // Reconcile handles WildlifePreserve resource reconciliation
 func (r *WildlifePreserveReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -50,21 +55,34 @@ func (r *WildlifePreserveReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	// Handle the volume creation based on the `Volume` field
-	if preserve.Spec.Volume != "" {
-		// Create a volume with the specified configuration
-		// You can use Kubernetes client (client.Client) to create the volume (e.g., PVC)
-		// Example: Create a PVC (PersistentVolumeClaim)
-		pvc := &coreV1.PersistentVolumeClaim{
-			ObjectMeta: metaV1.ObjectMeta{
-				Name: preserve.Name + "-volume",
-			},
-			Spec: coreV1.PersistentVolumeClaimSpec{
-				AccessModes: []coreV1.PersistentVolumeAccessMode{coreV1.ReadWriteOnce},
-				// Add other volume configuration as needed
-			},
-		}
-		if err := r.Create(ctx, pvc); err != nil {
-			return ctrl.Result{}, err
+	if preserve.Spec.VolumeMountPath != "" {
+		pvc := &coreV1.PersistentVolumeClaim{}
+		err := r.Get(ctx, types.NamespacedName{
+			Namespace: req.Namespace,
+			Name:      preserve.Name + "-volume-claim",
+		}, pvc)
+		if errors.IsNotFound(err) {
+			// Create a volume with the specified configuration
+			// You can use Kubernetes client (client.Client) to create the volume (e.g., PVC)
+			// Example: Create a PVC (PersistentVolumeClaim)
+			pvc = &coreV1.PersistentVolumeClaim{
+				ObjectMeta: metaV1.ObjectMeta{
+					Name:      preserve.Name + "-volume-claim",
+					Namespace: req.Namespace,
+				},
+				Spec: coreV1.PersistentVolumeClaimSpec{
+					AccessModes: []coreV1.PersistentVolumeAccessMode{coreV1.ReadWriteOnce},
+					Resources: coreV1.ResourceRequirements{
+						Requests: coreV1.ResourceList{
+							coreV1.ResourceStorage: resource.MustParse("100Mi"), // Adjust the storage size as needed
+						},
+					},
+				},
+			}
+			err = r.Create(ctx, pvc)
+			if err != nil && !errors.IsAlreadyExists(err) {
+				return ctrl.Result{}, err
+			}
 		}
 	}
 
@@ -84,17 +102,26 @@ func (r *WildlifePreserveReconciler) Reconcile(ctx context.Context, req ctrl.Req
 					Labels: map[string]string{"app": preserve.Name},
 				},
 				Spec: coreV1.PodSpec{
+					Volumes: []coreV1.Volume{
+						{
+							Name: preserve.Name + "-volume",
+							VolumeSource: coreV1.VolumeSource{
+								PersistentVolumeClaim: &coreV1.PersistentVolumeClaimVolumeSource{
+									ClaimName: preserve.Name + "-volume-claim",
+								},
+							},
+						},
+					},
 					Containers: []coreV1.Container{
 						{
 							Name:  "wildlife-preserve-app",
 							Image: "wildlife-preserve-app", // Replace with your Go app image
 							VolumeMounts: []coreV1.VolumeMount{
 								{
-									Name:      "animals-storage", // Replace with your volume name
-									MountPath: "/animals-storage",
+									Name:      preserve.Name + "-volume",
+									MountPath: preserve.Spec.VolumeMountPath,
 								},
 							},
-							// Add other container configuration as needed
 						},
 					},
 				},

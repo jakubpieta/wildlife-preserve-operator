@@ -1,4 +1,4 @@
-apiVersion: wildlife.preserves.my.domain/v1alpha1
+apiVersion: wildlife.preserves.jakubpieta/v1alpha1
 kind: WildlifePreserve
 metadata:
   labels:

@@ -2,7 +2,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: wildlifepreserves.wildlife.preserves.my.domain
+  name: wildlifepreserves.wildlife.preserves.jakubpieta
 spec:
   conversion:
     strategy: Webhook

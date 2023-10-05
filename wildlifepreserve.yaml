@@ -1,0 +1,10 @@
+apiVersion: wildlife.preserves.jakubpieta/v1alpha1
+kind: WildlifePreserve
+metadata:
+  name: bialowieza-wildlife-preserve
+  namespace: wildlife
+spec:
+  name: "Bialowieza"
+  volumeMountPath: "/animals-storage"
+  replicas: 3
+  location: "Poland"

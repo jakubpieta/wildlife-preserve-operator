@@ -3,6 +3,7 @@ module github.com/jakubpieta/wildlife-preserve-operator
 go 1.19
 
 require (
+	github.com/google/martian v2.1.0+incompatible
 	github.com/onsi/ginkgo/v2 v2.6.0
 	github.com/onsi/gomega v1.24.1
 	k8s.io/api v0.26.0

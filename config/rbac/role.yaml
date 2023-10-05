@@ -6,7 +6,40 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - wildlife.preserves.my.domain
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - wildlife.preserves.jakubpieta
   resources:
   - wildlifepreserves
   verbs:
@@ -18,13 +51,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - wildlife.preserves.my.domain
+  - wildlife.preserves.jakubpieta
   resources:
   - wildlifepreserves/finalizers
   verbs:
   - update
 - apiGroups:
-  - wildlife.preserves.my.domain
+  - wildlife.preserves.jakubpieta
   resources:
   - wildlifepreserves/status
   verbs:

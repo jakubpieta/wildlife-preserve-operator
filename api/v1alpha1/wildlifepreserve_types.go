@@ -25,10 +25,10 @@ import (
 
 // WildlifePreserveSpec defines the desired state of WildlifePreserve
 type WildlifePreserveSpec struct {
-	Name     string `json:"name"`
-	Location string `json:"location"`
-	Replicas int32  `json:"replicas"`
-	Volume   string `json:"volume"`
+	Name            string `json:"name"`
+	Location        string `json:"location"`
+	Replicas        int32  `json:"replicas"`
+	VolumeMountPath string `json:"volumeMountPath"`
 }
 
 // WildlifePreserveStatus defines the observed state of WildlifePreserve

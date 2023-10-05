@@ -42,13 +42,13 @@ spec:
               replicas:
                 format: int32
                 type: integer
-              volume:
+              volumeMountPath:
                 type: string
             required:
             - location
             - name
             - replicas
-            - volume
+            - volumeMountPath
             type: object
           status:
             description: WildlifePreserveStatus defines the observed state of WildlifePreserve
